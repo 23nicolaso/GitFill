@@ -25,27 +25,28 @@ def backfill():
         with open("backfill_log.txt", "w") as f:
             f.write("Backfill start\n")
 
-    for col in range(len(canvas[0])):
-        for row in range(7):
-            if canvas[row][col] == "1":
-                # Calculate the exact date for this 'pixel'
-                date = start_date + timedelta(weeks=col, days=row)
-                formatted_date = date.strftime('%Y-%m-%dT12:00:00')
-                
-                # Append to file to create a change
-                with open("backfill_log.txt", "a") as f:
-                    f.write(f"Commit for {formatted_date}\n")
-                
-                # Use subprocess to handle the Git commands
-                try:
-                    subprocess.run(["git", "add", "backfill_log.txt"], check=True)
-                    subprocess.run([
-                        "git", "commit", 
-                        f"--date={formatted_date}", 
-                        "-m", f"backfill: {formatted_date}"
-                    ], check=True, capture_output=True)
-                except subprocess.CalledProcessError as e:
-                    print(f"Error at {formatted_date}: {e}")
+    for i in range(7):
+        for col in range(len(canvas[0])):
+            for row in range(7):
+                if canvas[row][col] == "1":
+                    # Calculate the exact date for this 'pixel'
+                    date = start_date + timedelta(weeks=col, days=row)
+                    formatted_date = date.strftime('%Y-%m-%dT12:00:00')
+                    
+                    # Append to file to create a change
+                    with open("backfill_log.txt", "a") as f:
+                        f.write(f"Commit for {formatted_date}\n")
+                    
+                    # Use subprocess to handle the Git commands
+                    try:
+                        subprocess.run(["git", "add", "backfill_log.txt"], check=True)
+                        subprocess.run([
+                            "git", "commit", 
+                            f"--date={formatted_date}", 
+                            "-m", f"backfill: {formatted_date}"
+                        ], check=True, capture_output=True)
+                    except subprocess.CalledProcessError as e:
+                        print(f"Error at {formatted_date}: {e}")
 
     print("Backfill complete. Push to GitHub to see the magic.")
 
